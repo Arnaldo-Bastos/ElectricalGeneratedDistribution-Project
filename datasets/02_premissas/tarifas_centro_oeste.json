@@ -1,0 +1,84 @@
+{
+  "regional": "Centro-Oeste",
+  "responsavel": "Analista Faturamento CO",
+  "atualizado_em": "2026-09-30",
+  "unidade": "R$/kWh",
+  "tarifas": [
+    {
+      "distribuidora": {
+        "nome": "EQUATORIAL GO",
+        "uf": "GO"
+      },
+      "vigencia": {
+        "inicio": "2024-10-22",
+        "fim": "2025-10-21"
+      },
+      "componentes": {
+        "te": 0.31,
+        "tusd": 0.49,
+        "tusd_fio_b": 0.26
+      },
+      "tributos": {
+        "icms": 0.19,
+        "pis_cofins": 0.053
+      }
+    },
+    {
+      "distribuidora": {
+        "nome": "Equatorial Goiás",
+        "uf": "GO"
+      },
+      "vigencia": {
+        "inicio": "2025-10-22",
+        "fim": null
+      },
+      "componentes": {
+        "te": 0.32535,
+        "tusd": 0.51965,
+        "tusd_fio_b": 0.27644
+      },
+      "tributos": {
+        "icms": 0.19,
+        "pis_cofins": 0.053
+      }
+    },
+    {
+      "distribuidora": {
+        "nome": "ENERGISA MT",
+        "uf": "MT"
+      },
+      "vigencia": {
+        "inicio": "2025-04-22",
+        "fim": "2026-04-21"
+      },
+      "componentes": {
+        "te": 0.32,
+        "tusd": 0.53,
+        "tusd_fio_b": 0.28
+      },
+      "tributos": {
+        "icms": 0.17,
+        "pis_cofins": 0.051
+      }
+    },
+    {
+      "distribuidora": {
+        "nome": "ENERGISA MT",
+        "uf": "MT"
+      },
+      "vigencia": {
+        "inicio": "2026-04-22",
+        "fim": null
+      },
+      "componentes": {
+        "te": 0.33382,
+        "tusd": 0.55798,
+        "tusd_fio_b": 0.29546
+      },
+      "tributos": {
+        "icms": 0.17,
+        "pis_cofins": 0.051
+      }
+    }
+  ]
+}
