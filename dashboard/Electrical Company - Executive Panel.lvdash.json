@@ -1,0 +1,952 @@
+{
+  "datasets": [
+    {
+      "name": "8c73aa11",
+      "displayName": "fact_measurements_invoiced",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.gold.fact_measurements_invoiced",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          },
+          {
+            "name": "count_diff_le_1",
+            "expr": "COUNT_IF(ABS(`total_invoiced_NEW` - `total_invoiced_OLD`) <= 1)",
+            "displayName": "UC-mês com diferença até R$ 1"
+          },
+          {
+            "name": "pct_uc_mes_diff_le_1",
+            "expr": "MEASURE(`count_diff_le_1`) / MEASURE(`count`)",
+            "displayName": "% UC-mês com diferença até R$ 1",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            }
+          },
+          {
+            "name": "count_active_uc_mes",
+            "expr": "COUNT_IF(`contract_status` = 'ACTIVE')",
+            "displayName": "UC-mês Ativos"
+          },
+          {
+            "name": "pct_active_uc_mes",
+            "expr": "MEASURE(`count_active_uc_mes`) / MEASURE(`count`)",
+            "displayName": "% UC-mês Ativos",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            }
+          },
+          {
+            "name": "count_active_clients",
+            "expr": "COUNT(DISTINCT `customer_id`) FILTER (WHERE `contract_status` = 'ACTIVE')",
+            "displayName": "Active Clients"
+          },
+          {
+            "name": "count_total_clients",
+            "expr": "COUNT(DISTINCT `customer_id`)",
+            "displayName": "Total Clients"
+          },
+          {
+            "name": "pct_active_clients",
+            "expr": "MEASURE(`count_active_clients`) / MEASURE(`count_total_clients`)",
+            "displayName": "% Clientes Ativos",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            }
+          },
+          {
+            "displayName": "Receita Não Faturada (NEW - OLD)",
+            "format": {
+              "type": "currency",
+              "currencyCode": "BRL",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            },
+            "name": "revenue_not_invoiced",
+            "expr": "SUM(`total_invoiced_NEW`) - SUM(`total_invoiced_OLD`)",
+            "comment": "Diferença entre o total que deveria ser faturado pelo modelo novo (NEW) e o efetivamente faturado pelo ERP (OLD). Positivo = receita que deixou de ser faturada."
+          },
+          {
+            "displayName": "Total a Ressarcir aos Clientes",
+            "format": {
+              "type": "currency",
+              "currencyCode": "BRL",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            },
+            "name": "total_refund_to_customers",
+            "expr": "SUM(`total_refund_to_customer`)",
+            "comment": "Soma dos valores a ressarcir por faturamento incorreto (modelo novo versus ERP)."
+          }
+        ]
+      }
+    }
+  ],
+  "relationshipGraphs": [
+    {
+      "sources": [
+        {
+          "name": "fact_measurements_invoiced",
+          "datasetName": "8c73aa11"
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "f55fdc20",
+      "displayName": "Resumo Executivo",
+      "layout": [
+        {
+          "widget": {
+            "name": "regional",
+            "queries": [
+              {
+                "name": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_regional",
+                "query": {
+                  "datasetName": "8c73aa11",
+                  "fields": [
+                    {
+                      "name": "regional",
+                      "expression": "`regional`"
+                    },
+                    {
+                      "name": "regional_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "headerAlignment": "center",
+                "title": {
+                  "value": "Regional:",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "regional",
+                    "queryName": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_regional"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 4,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "uf",
+            "queries": [
+              {
+                "name": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_uf",
+                "query": {
+                  "datasetName": "8c73aa11",
+                  "fields": [
+                    {
+                      "name": "uf",
+                      "expression": "`uf`"
+                    },
+                    {
+                      "name": "uf_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "headerAlignment": "center",
+                "title": {
+                  "value": "UF:",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "uf",
+                    "queryName": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_uf"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 4,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "plant",
+            "queries": [
+              {
+                "name": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_plant_name",
+                "query": {
+                  "datasetName": "8c73aa11",
+                  "fields": [
+                    {
+                      "name": "plant_name",
+                      "expression": "`plant_name`"
+                    },
+                    {
+                      "name": "plant_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "headerAlignment": "center",
+                "title": {
+                  "value": "Plant:",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "plant_name",
+                    "queryName": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_plant_name"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 4,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "money-saved-by-customers-monthly",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_measurements_invoiced__reference_date",
+                      "expression": "`fact_measurements_invoiced`.`reference_date`"
+                    },
+                    {
+                      "name": "sum(fact_measurements_invoiced__total_BRL_saved)",
+                      "expression": "SUM(`fact_measurements_invoiced`.`total_BRL_saved`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Money Saved by Customers Monthly",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "mark": {
+                "colors": [
+                  "#8DDF62"
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_measurements_invoiced__reference_date",
+                  "axis": {
+                    "labelAngle": 45
+                  },
+                  "displayName": "Period",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(fact_measurements_invoiced__total_BRL_saved)",
+                  "axis": {
+                    "hideGrid": true
+                  },
+                  "displayName": "R$ Saved by Customers",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "total-invoiced-monthly",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_measurements_invoiced__reference_date",
+                      "expression": "`fact_measurements_invoiced`.`reference_date`"
+                    },
+                    {
+                      "name": "sum(fact_measurements_invoiced__total_invoiced_OLD)",
+                      "expression": "SUM(`fact_measurements_invoiced`.`total_invoiced_OLD`)"
+                    },
+                    {
+                      "name": "sum(fact_measurements_invoiced__total_invoiced_NEW)",
+                      "expression": "SUM(`fact_measurements_invoiced`.`total_invoiced_NEW`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total Invoiced Monthly",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "mark": {
+                "colors": [
+                  "#B1828B",
+                  "#1C2B7C"
+                ],
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_measurements_invoiced__reference_date",
+                  "displayName": "Period",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "sum(fact_measurements_invoiced__total_invoiced_OLD)",
+                      "displayName": "Invoiced by OLD model"
+                    },
+                    {
+                      "fieldName": "sum(fact_measurements_invoiced__total_invoiced_NEW)",
+                      "displayName": "Invoiced by NEW model"
+                    }
+                  ],
+                  "axis": {
+                    "hideGrid": true,
+                    "title": "R$ Invoiced"
+                  }
+                },
+                "color": {
+                  "legend": {
+                    "hideTitle": true,
+                    "position": "top"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pie_regional_invoices",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_measurements_invoiced__count)",
+                      "expression": "MEASURE(`fact_measurements_invoiced`.`count`)"
+                    },
+                    {
+                      "name": "fact_measurements_invoiced__regional",
+                      "expression": "`fact_measurements_invoiced`.`regional`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Invoices by Regional",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "measure(fact_measurements_invoiced__count)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": " "
+                },
+                "color": {
+                  "fieldName": "fact_measurements_invoiced__regional",
+                  "legend": {
+                    "hideTitle": true,
+                    "position": "top"
+                  },
+                  "displayName": "regional",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "nordeste",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 6
+                        }
+                      }
+                    ],
+                    "sort": {
+                      "by": "natural-order"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_pct_uc_mes_diff_le_1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_measurements_invoiced__reference_date",
+                      "expression": "`fact_measurements_invoiced`.`reference_date`"
+                    },
+                    {
+                      "name": "measure(fact_measurements_invoiced__pct_uc_mes_diff_le_1)",
+                      "expression": "MEASURE(`fact_measurements_invoiced`.`pct_uc_mes_diff_le_1`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "% UC-month with difference invoiced < R$ 1",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "mark": {
+                "marker": {
+                  "shape": "circle"
+                },
+                "size": 0.7
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_measurements_invoiced__reference_date",
+                  "axis": {
+                    "labelAngle": 0
+                  },
+                  "displayName": "Period",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_measurements_invoiced__pct_uc_mes_diff_le_1)",
+                  "axis": {
+                    "hideGrid": true
+                  },
+                  "displayName": "% UC",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "flag-additional-charge-monthly",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_measurements_invoiced__flag",
+                      "expression": "`fact_measurements_invoiced`.`flag`"
+                    },
+                    {
+                      "name": "fact_measurements_invoiced__reference_date",
+                      "expression": "`fact_measurements_invoiced`.`reference_date`"
+                    },
+                    {
+                      "name": "count(fact_measurements_invoiced__flag)",
+                      "expression": "COUNT(`fact_measurements_invoiced`.`flag`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Flag of Additional Charge Monthly",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_measurements_invoiced__reference_date",
+                  "axis": {
+                    "hideTitle": true,
+                    "hideLabels": false
+                  },
+                  "displayName": " ",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(fact_measurements_invoiced__flag)",
+                  "axis": {
+                    "hideLabels": true,
+                    "hideGrid": true,
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "fact_measurements_invoiced__flag",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "AMARELA",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      },
+                      {
+                        "value": "VERDE",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      },
+                      {
+                        "value": "VERMELHA_P1",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            },
+            "filterSources": {
+              "mode": "EXCLUDE",
+              "global": {
+                "all": true
+              },
+              "page": {
+                "all": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "number-of-active-contracts-monthly",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_measurements_invoiced__reference_date",
+                      "expression": "`fact_measurements_invoiced`.`reference_date`"
+                    },
+                    {
+                      "name": "measure(fact_measurements_invoiced__pct_active_clients)",
+                      "expression": "MEASURE(`fact_measurements_invoiced`.`pct_active_clients`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Number of Active Contracts Monthly",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_measurements_invoiced__reference_date",
+                  "displayName": "Period",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_measurements_invoiced__pct_active_clients)",
+                  "displayName": "Active Contracts",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 16,
+            "width": 8,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "distributor",
+            "queries": [
+              {
+                "name": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_distributor",
+                "query": {
+                  "datasetName": "8c73aa11",
+                  "fields": [
+                    {
+                      "name": "distributor",
+                      "expression": "`distributor`"
+                    },
+                    {
+                      "name": "distributor_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Distributor:",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "distributor",
+                    "queryName": "dashboards/01f1d264a0a21e47b2d99aa9b845b366/datasets/c332c61139954d069138dfb2e7ecfeb4_distributor"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 4,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "7c57ae63",
+            "multilineTextboxSpec": {
+              "lines": [
+                "#### <span style=\"text-align:center;display:block\"><span style=\"font-size:36px;line-height:1.5;font-family:Trebuchet MS\">Hypothetical Electricity Co.</span></span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "counter_revenue_not_invoiced",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_measurements_invoiced__revenue_not_invoiced)",
+                      "expression": "MEASURE(`fact_measurements_invoiced`.`revenue_not_invoiced`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Receita Não Faturada (NEW - OLD)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(fact_measurements_invoiced__revenue_not_invoiced)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 27,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "counter_total_refund_to_customers",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "sum(fact_measurements_invoiced__total_refund_to_customer)",
+                      "expression": "SUM(`fact_measurements_invoiced`.`total_refund_to_customer`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total a Ressarcir aos Clientes",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(fact_measurements_invoiced__total_refund_to_customer)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 27,
+            "width": 6,
+            "height": 3
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "8720e9c9",
+      "displayName": "Global Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#FAFAFB",
+        "dark": "#000000"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#11171C"
+      },
+      "fontColor": {
+        "light": "#11171C",
+        "dark": "#E8ECF0"
+      },
+      "selectionColor": {
+        "light": "#2272B4",
+        "dark": "#8ACAFF"
+      },
+      "widgetHeaderAlignment": "CENTER",
+      "textBoxVerticalAlign": "VERTICAL_ALIGN_CENTER"
+    },
+    "applyModeEnabled": false
+  }
+}
