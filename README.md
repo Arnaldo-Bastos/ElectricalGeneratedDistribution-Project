@@ -19,24 +19,22 @@ Electro Fantasy Co. sells solar energy credits to 336 business customers in 9 Br
 
 This project centralizes every billing assumption, recalculates each customer's invoice from the utility's meter readings, and reconciles the result with what the ERP actually charged.
 
-| What the dashboard shows (Oct 2025 – Sep 2026) | Value |
+| What the dashboard shows (10/2025 – 09/2026) | Value |
 | --- | --- |
-| 💰 **Revenue not invoiced** (new model − ERP) | **R$ 931,704.19** |
-| ⚠️ **Improperly invoiced revenue** (refunds owed to customers) | **R$ 505,826.35** |
-| 📊 **Total billing exposure found** | **R$ 1.44 million** |
-| 🎯 UC-months billed within R$ 1 of the correct value | **21% to 75%**, depending on the month |
-| 🌱 Savings delivered to customers | **≈ R$ 4.5 million** (R$ 330K–427K per month) |
-| 🧪 Meter readings quarantined for data quality | **95** (28 consumer units) |
+| **Revenue not invoiced** (new model − ERP) | **~ R$ 900K** |
+| **Improperly invoiced revenue** (refunds owed to customers) | **~ R$ 500K** |
+| Savings delivered to customers | **≈ R$ 4.5 million** (R$ 330K–427K per month) |
+| Meter readings quarantined for data quality | **95** (28 consumer units) |
 
 ---
 
 ## The business problem
 
-In Brazil's **shared distributed generation** model (*geração distribuída compartilhada*), a company operates solar plants connected to the local utility's grid. The energy injected becomes **kWh credits** that offset each customer's electricity bill. Customers then pay the generation company for the compensated kWh, with a contractual discount on the utility's tariff.
+In Brazil's **shared distributed generation** model (*geração distribuída compartilhada*), the company operates solar plants connected to the local utility's grid. The energy injected becomes **kWh credits** that offset each customer's electricity bill. Customers then pay the generation company for the compensated kWh, with a contractual discount on the utility's tariff.
 
 Billing sounds simple. It is not, because the reference price changes by **utility, date and plant**:
 
-- 🏢 **9 utilities, 9 tariff schedules.** Each one has its own annual tariff readjustment date (May for CEMIG, June for Copel, July for Enel SP, August for Celesc…).
+- 🏢 **9 utilities, 9 tariff schedules.** Each one has its own annual tariff readjustment date.
 - 🚦 **Monthly tariff flags.** ANEEL adds a surcharge per kWh every month: green, yellow or red.
 - 🧾 **State taxes.** ICMS ranges from 17% to 20.5% depending on the state, plus PIS/COFINS.
 - ⚖️ **Law 14.300/2022.** Plants that requested grid access after 7 Jan 2023 (GD II) stop compensating a growing share of the TUSD "Wire B" component: 45% in 2025 and 60% in 2026. Older plants (GD I) are exempt.
@@ -59,7 +57,7 @@ flowchart LR
         A4[ERP<br/>issued invoices]
     end
 
-    A1 & A2 & A3 & A4 --> GCS[(Google Cloud<br/>Storage bucket)]
+    A1 & A2 & A3 & A4 --> GCS[(Cloud Service<br/>Storage Bucket)]
     GCS --> VOL[Unity Catalog<br/>Volume]
 
     subgraph Databricks [Databricks · Delta Lake · Unity Catalog]
@@ -128,14 +126,6 @@ Together, the two numbers add up to **R$ 1.44 million in billing exposure** foun
 
 The share of UC-months invoiced within R$ 1 of the correct value tells the operational story:
 
-| Period | Accuracy | What was happening |
-| --- | --- | --- |
-| Oct–Nov 2025 | ≈ 52% | Red flag (P1) in force: every missed surcharge costs more |
-| Jan–Apr 2026 | 68% → 75% | Green flag: no surcharge to forget |
-| May 2026 | 49% | Yellow flag returns |
-| Jun–Jul 2026 | 31% → **21%** | Yellow flag missed in some regions, plus tariff readjustments (CEMIG, Copel, Energisa MT, Coelba) not yet updated in the regional spreadsheets |
-| Aug–Sep 2026 | 37% → 50% | Partial recovery |
-
 The **"Flag of Additional Charge Monthly"** strip at the top of the panel lines up with this curve. Errors spike exactly when a rule changes: a new flag color or a tariff readjustment. Manual, decentralized processes don't track regulatory change fast enough, and a centralized assumption table fixes that.
 
 ### 4. Customers saved ≈ R$ 4.5 million
@@ -152,39 +142,11 @@ The **Quarantine** page makes data problems visible instead of letting them sile
 - Quarantined readings by region: Southeast **43%**, Northeast **29%**, Center-West **25%**, South **2%**.
 - **35 customers** have incomplete records: **77%** are missing a billing email and **23%** a business segment.
 
-### Other indicators on the panel
-
-- **Invoices by region:** Southeast 47.4%, South 20.4%, Center-West 18.1%, Northeast 14.2%.
-- **Active contracts:** 98.4% to 100% of customers active each month.
-- **Filters:** region, state, utility and solar plant, so each regional manager can see their own numbers.
-
 <!--
 Add dashboard screenshots here, for example:
 ![Executive Panel](docs/images/executive_panel.png)
 ![Quarantine page](docs/images/quarantine_page.png)
 -->
-
----
-
-## Data engineering challenges solved
-
-The raw data was deliberately messy, the way real regional files are:
-
-| Challenge | Where | How it was handled |
-| --- | --- | --- |
-| 4 file layouts for the same entity | Meter readings | One parser per layout, unified into a single Silver schema |
-| `;` vs `,` separators, comma decimals | Southeast, Northeast | Explicit separators and decimal conversion |
-| Values in **MWh** instead of kWh | Northeast | Unit conversion with rounding to avoid float noise |
-| Windows-1252 encoding, accented headers | Northeast | Explicit encoding on read |
-| Leading zeros lost in IDs | South | `lpad` to 10 digits |
-| Nested JSON, negative signs | Center-West | `explode` + absolute value |
-| File re-sent with corrections (`_v2`) | South, Mar 2026 | Latest version supersedes the original |
-| Tariffs in R$/kWh, R$/MWh and JSON | Regional tariff files | Normalized to R$/kWh |
-| Overlapping tariff validity periods | South | Window function moves the newer start date to the day after the previous end |
-| Duplicate rows and records | Readings, CRM, tariffs | Primary-key deduplication |
-| Discounts as `0.15`, `15%`, `0,15`, `15` | Contracts | Normalized to a fraction |
-| Mixed date formats (ISO and dd/MM/yyyy) | Several | Format detected per value with `try_to_date` + `coalesce` |
-| Null reading dates | Several | Last day of the reference month |
 
 ---
 
@@ -214,38 +176,16 @@ The raw data was deliberately messy, the way real regional files are:
 
 ---
 
-## How to run it
-
-1. **Storage.** Upload the `datasets/` folder to a cloud bucket (this project uses Google Cloud Storage), keeping the folder structure.
-2. **Databricks.** Create a catalog with `bronze`, `silver`, `gold` and `quarantine` schemas, plus a Unity Catalog Volume for the landing files. Sync the bucket into the Volume.
-3. **Bronze.** Run `01_ingestion…/historical_data`.
-4. **Silver.** Run the `step00` notebooks, then each entity in `02_extracting…/historical_data`, then `MEASUREMENTS`.
-5. **Gold.** Run `03_loading…/historical_data`.
-6. **Dashboard.** Import `dashboard/Electrical Company - Executive Panel.lvdash.json` into your workspace (Workspace → Import) and point its datasets at your catalog.
-7. **Next months.** Drop new files in the bucket and run the `incremental_data` notebooks.
-
----
-
 ## Tech stack
 
 | Purpose | Tool |
 | --- | --- |
-| Cloud storage | Google Cloud Storage |
+| Cloud storage | GCP, AWS(s3), etc... |
 | Processing | Databricks (serverless), PySpark, Spark SQL |
 | Storage format and governance | Delta Lake, Unity Catalog (Volumes, schemas) |
 | Architecture | Medallion (Bronze → Silver → Gold) + Quarantine |
 | BI | Databricks AI/BI Dashboards |
 | Version control | Git / GitHub |
-
----
-
-## What's next
-
-- **Orchestration:** chain the incremental notebooks into a single scheduled Databricks Job.
-- **Automated data-quality tests:** row-count, uniqueness and reconciliation checks that fail the pipeline instead of only printing.
-- **Root-cause view:** classify each divergent invoice by cause (outdated tariff, missing flag, wrong discount, Wire B on GD I plants, duplicate invoice), so each regional team knows what to fix first.
-- **Credit balance tracking:** follow each customer's accumulated kWh credits to flag quotas larger than real consumption.
-- **Plant profitability:** add CAPEX and O&M costs per plant to rank solar plants by margin, not just revenue.
 
 ---
 
