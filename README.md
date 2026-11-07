@@ -21,8 +21,8 @@ This project centralizes every billing assumption, recalculates each customer's 
 
 | What the dashboard shows (10/2025 – 09/2026) | Value |
 | --- | --- |
-| **Revenue not invoiced** (new model − ERP) | **~ R$ 900K** |
-| **Improperly invoiced revenue** (refunds owed to customers) | **~ R$ 500K** |
+| **Revenue not invoiced** (new model − ERP) | **~R$ 900K** |
+| **Improperly invoiced revenue** (refunds owed to customers) | **~R$ 500K** |
 | Savings delivered to customers | **≈ R$ 4.5 million** (R$ 330K–427K per month) |
 | Meter readings quarantined for data quality | **95** (28 consumer units) |
 
