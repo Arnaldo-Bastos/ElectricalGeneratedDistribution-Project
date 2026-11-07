@@ -104,6 +104,92 @@
           }
         ]
       }
+    },
+    {
+      "name": "quarantine_measurements",
+      "displayName": "quarantine_measurements",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT '202510' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202510 UNION ALL SELECT '202511' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202511 UNION ALL SELECT '202512' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202512 UNION ALL SELECT '202601' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202601 UNION ALL SELECT '202602' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202602 UNION ALL SELECT '202603' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202603 UNION ALL SELECT '202604' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202604 UNION ALL SELECT '202605' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202605 UNION ALL SELECT '202606' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202606 UNION ALL SELECT '202607' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202607 UNION ALL SELECT '202608' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202608 UNION ALL SELECT '202609' AS reference_date, regional, reading_at, uc, consume_kwh, compensated_energy_kwh, balance_kwh, invoice_id, motive FROM workspace.quarantine.warning_measurements_202609\n",
+        "dimensions": [
+          {
+            "name": "reference_date",
+            "expr": "reference_date",
+            "displayName": "Period"
+          },
+          {
+            "name": "regional",
+            "expr": "regional"
+          },
+          {
+            "name": "uc",
+            "expr": "uc"
+          },
+          {
+            "name": "motive",
+            "expr": "motive"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "displayName": "Quarantined Measurements"
+          },
+          {
+            "name": "distinct_uc",
+            "expr": "COUNT(DISTINCT uc)",
+            "displayName": "Distinct UCs"
+          },
+          {
+            "name": "compensated_energy_kwh_total",
+            "expr": "SUM(compensated_energy_kwh)",
+            "displayName": "Compensated Energy (kWh)"
+          },
+          {
+            "name": "consume_kwh_total",
+            "expr": "SUM(consume_kwh)",
+            "displayName": "Consumed Energy (kWh)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "quarantine_warning_customers",
+      "displayName": "quarantine_warning_customers",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.quarantine.warning_customers",
+        "dimensions": [
+          {
+            "name": "customer_id",
+            "expr": "customer_id"
+          },
+          {
+            "name": "legal_name",
+            "expr": "legal_name"
+          },
+          {
+            "name": "segment",
+            "expr": "segment"
+          },
+          {
+            "name": "uf",
+            "expr": "uf"
+          },
+          {
+            "name": "motive",
+            "expr": "motive"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "displayName": "Warning Customers"
+          }
+        ]
+      }
     }
   ],
   "relationshipGraphs": [
@@ -112,6 +198,14 @@
         {
           "name": "fact_measurements_invoiced",
           "datasetName": "8c73aa11"
+        },
+        {
+          "name": "quarantine_measurements",
+          "datasetName": "quarantine_measurements"
+        },
+        {
+          "name": "quarantine_warning_customers",
+          "datasetName": "quarantine_warning_customers"
         }
       ]
     }
@@ -303,7 +397,7 @@
               "version": 3,
               "mark": {
                 "colors": [
-                  "#8DDF62"
+                  "#0043A6"
                 ]
               },
               "widgetType": "bar",
@@ -339,7 +433,7 @@
           },
           "position": {
             "x": 0,
-            "y": 21,
+            "y": 23,
             "width": 12,
             "height": 6
           }
@@ -380,8 +474,8 @@
               "version": 3,
               "mark": {
                 "colors": [
-                  "#B1828B",
-                  "#1C2B7C"
+                  "#00BBC8",
+                  "#0E0E76"
                 ],
                 "layout": "group"
               },
@@ -430,7 +524,7 @@
           },
           "position": {
             "x": 0,
-            "y": 5,
+            "y": 7,
             "width": 12,
             "height": 6
           }
@@ -486,10 +580,19 @@
                     "mappings": [
                       {
                         "value": "nordeste",
-                        "color": {
-                          "themeColorType": "visualizationColors",
-                          "position": 6
-                        }
+                        "color": "#00E0BF"
+                      },
+                      {
+                        "value": "sudeste",
+                        "color": "#0E0E76"
+                      },
+                      {
+                        "value": "sul",
+                        "color": "#006DC3"
+                      },
+                      {
+                        "value": "centro-oeste",
+                        "color": "#00BBC8"
                       }
                     ],
                     "sort": {
@@ -508,7 +611,7 @@
           },
           "position": {
             "x": 0,
-            "y": 16,
+            "y": 18,
             "width": 4,
             "height": 5
           }
@@ -547,6 +650,9 @@
                 "marker": {
                   "shape": "circle"
                 },
+                "colors": [
+                  "#00E0BF"
+                ],
                 "size": 0.7
               },
               "widgetType": "line",
@@ -582,7 +688,7 @@
           },
           "position": {
             "x": 0,
-            "y": 11,
+            "y": 13,
             "width": 12,
             "height": 5
           }
@@ -729,10 +835,18 @@
                 }
               },
               "version": 3,
-              "widgetType": "bar",
+              "mark": {
+                "colors": [
+                  "#00E0BF"
+                ]
+              },
+              "widgetType": "line",
               "encodings": {
                 "x": {
                   "fieldName": "fact_measurements_invoiced__reference_date",
+                  "axis": {
+                    "labelAngle": 45
+                  },
                   "displayName": "Period",
                   "scale": {
                     "type": "categorical"
@@ -740,6 +854,9 @@
                 },
                 "y": {
                   "fieldName": "measure(fact_measurements_invoiced__pct_active_clients)",
+                  "axis": {
+                    "hideGrid": true
+                  },
                   "displayName": "Active Contracts",
                   "scale": {
                     "type": "quantitative"
@@ -756,7 +873,7 @@
           },
           "position": {
             "x": 4,
-            "y": 16,
+            "y": 18,
             "width": 8,
             "height": 5
           }
@@ -813,10 +930,17 @@
         {
           "widget": {
             "name": "7c57ae63",
-            "multilineTextboxSpec": {
-              "lines": [
-                "#### <span style=\"text-align:center;display:block\"><span style=\"font-size:36px;line-height:1.5;font-family:Trebuchet MS\">Hypothetical Electricity Co.</span></span>"
-              ]
+            "spec": {
+              "widgetType": "text",
+              "version": 1,
+              "encodings": {
+                "text": {
+                  "lines": [
+                    "#### <span style=\"text-align:center;display:block\"><span style=\"font-size:36px;line-height:1.5;font-family:Trebuchet MS\">Electro Fantasy Co.</span></span>"
+                  ],
+                  "fields": []
+                }
+              }
             }
           },
           "position": {
@@ -828,7 +952,7 @@
         },
         {
           "widget": {
-            "name": "counter_revenue_not_invoiced",
+            "name": "revenue-not-invoiced-card",
             "queries": [
               {
                 "name": "main_query",
@@ -847,7 +971,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Receita Não Faturada (NEW - OLD)",
+                  "value": "Revenue not Invoiced",
                   "fields": []
                 }
               },
@@ -856,7 +980,17 @@
               "encodings": {
                 "value": {
                   "fieldName": "measure(fact_measurements_invoiced__revenue_not_invoiced)",
-                  "rowNumber": 0
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "BRL",
+                    "abbreviation": "none",
+                    "negativeSign": "accounting",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    }
+                  },
+                  "displayName": "Receita Não Faturada"
                 }
               },
               "data": {
@@ -866,22 +1000,22 @@
           },
           "position": {
             "x": 0,
-            "y": 27,
+            "y": 5,
             "width": 6,
-            "height": 3
+            "height": 2
           }
         },
         {
           "widget": {
-            "name": "counter_total_refund_to_customers",
+            "name": "improper-invoiced-revenue-card",
             "queries": [
               {
                 "name": "main_query",
                 "query": {
                   "fields": [
                     {
-                      "name": "sum(fact_measurements_invoiced__total_refund_to_customer)",
-                      "expression": "SUM(`fact_measurements_invoiced`.`total_refund_to_customer`)"
+                      "name": "measure(fact_measurements_invoiced__total_refund_to_customers)",
+                      "expression": "MEASURE(`fact_measurements_invoiced`.`total_refund_to_customers`)"
                     }
                   ],
                   "disaggregated": false
@@ -892,7 +1026,7 @@
               "frame": {
                 "showTitle": true,
                 "title": {
-                  "value": "Total a Ressarcir aos Clientes",
+                  "value": "Improperly Invoiced Revenue",
                   "fields": []
                 }
               },
@@ -900,7 +1034,18 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "sum(fact_measurements_invoiced__total_refund_to_customer)"
+                  "fieldName": "measure(fact_measurements_invoiced__total_refund_to_customers)",
+                  "format": {
+                    "abbreviation": "none",
+                    "currencyCode": "BRL",
+                    "decimalPlaces": {
+                      "places": 2,
+                      "type": "exact"
+                    },
+                    "negativeSign": "accounting",
+                    "type": "number-currency"
+                  },
+                  "displayName": "Improperly Invoiced Revenue"
                 }
               },
               "data": {
@@ -910,9 +1055,9 @@
           },
           "position": {
             "x": 6,
-            "y": 27,
+            "y": 5,
             "width": 6,
-            "height": 3
+            "height": 2
           }
         }
       ],
@@ -923,6 +1068,686 @@
       "name": "8720e9c9",
       "displayName": "Global Filters",
       "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "510651db",
+      "displayName": "Quarantine",
+      "layout": [
+        {
+          "widget": {
+            "name": "header",
+            "spec": {
+              "version": 1,
+              "widgetType": "text",
+              "encodings": {
+                "text": {
+                  "fields": [],
+                  "lines": [
+                    "#### <span style=\"text-align:center;display:block\"><span style=\"font-size:36px;line-height:1.5;font-family:Trebuchet MS\">Quarantine</span></span>"
+                  ]
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "quarantined-measurements-counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(quarantine_measurements__count)",
+                      "expression": "MEASURE(`quarantine_measurements`.`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Quarantined Measurements"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(quarantine_measurements__count)",
+                  "displayName": "Quarantined Measurements"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "distinct-ucs-counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(quarantine_measurements__distinct_uc)",
+                      "expression": "MEASURE(`quarantine_measurements`.`distinct_uc`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Distinct UCs Affected"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(quarantine_measurements__distinct_uc)",
+                  "displayName": "Distinct UCs Affected"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "warning-customers-counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(quarantine_warning_customers__count)",
+                      "expression": "MEASURE(`quarantine_warning_customers`.`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Customers with Warnings"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(quarantine_warning_customers__count)",
+                  "displayName": "Customers with Warnings"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "quarantine-by-month-motive",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "quarantine_measurements__motive",
+                      "expression": "`quarantine_measurements`.`motive`"
+                    },
+                    {
+                      "name": "quarantine_measurements__reference_date",
+                      "expression": "`quarantine_measurements`.`reference_date`"
+                    },
+                    {
+                      "name": "measure(quarantine_measurements__count)",
+                      "expression": "MEASURE(`quarantine_measurements`.`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Quarantined Measurements by Month and Motive",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "quarantine_measurements__reference_date",
+                  "displayName": "Period",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(quarantine_measurements__count)",
+                  "axis": {
+                    "hideGrid": true
+                  },
+                  "displayName": "Measurements",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "quarantine_measurements__motive",
+                  "legend": {
+                    "hideTitle": true,
+                    "position": "top"
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "UC without contract",
+                        "color": "#00E0BF"
+                      },
+                      {
+                        "value": "Energy compensated > consumed",
+                        "color": "#0E0E76"
+                      }
+                    ]
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "quarantine-by-regional",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(quarantine_measurements__count)",
+                      "expression": "MEASURE(`quarantine_measurements`.`count`)"
+                    },
+                    {
+                      "name": "quarantine_measurements__regional",
+                      "expression": "`quarantine_measurements`.`regional`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Quarantined Measurements by Regional",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "measure(quarantine_measurements__count)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": " "
+                },
+                "color": {
+                  "fieldName": "quarantine_measurements__regional",
+                  "legend": {
+                    "hideTitle": true,
+                    "position": "top"
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "sudeste",
+                        "color": "#0E0E76"
+                      },
+                      {
+                        "value": "nordeste",
+                        "color": "#00BBC8"
+                      },
+                      {
+                        "value": "centro-oeste",
+                        "color": "#0095CC"
+                      },
+                      {
+                        "value": "sul",
+                        "color": "#0043A6"
+                      }
+                    ]
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "quarantine-energy-kwh",
+            "queries": [
+              {
+                "name": "combo_primary_1",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "quarantine_measurements__reference_date",
+                      "expression": "`quarantine_measurements`.`reference_date`"
+                    },
+                    {
+                      "name": "measure(quarantine_measurements__compensated_energy_kwh_total)",
+                      "expression": "MEASURE(`quarantine_measurements`.`compensated_energy_kwh_total`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "combo_secondary_1",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "quarantine_measurements__reference_date",
+                      "expression": "`quarantine_measurements`.`reference_date`"
+                    },
+                    {
+                      "name": "measure(quarantine_measurements__consume_kwh_total)",
+                      "expression": "MEASURE(`quarantine_measurements`.`consume_kwh_total`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Compensated vs Consumed Energy in Quarantine",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "combo",
+              "encodings": {
+                "x": {
+                  "fieldName": "quarantine_measurements__reference_date",
+                  "axis": {
+                    "labelAngle": 45
+                  },
+                  "displayName": "Period",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "layers": [
+                      {
+                        "visual": "bar",
+                        "mark": {
+                          "colors": [
+                            "#00E0BF"
+                          ]
+                        },
+                        "encodings": {
+                          "value": {
+                            "fields": [
+                              {
+                                "fieldName": "measure(quarantine_measurements__compensated_energy_kwh_total)",
+                                "displayName": "Compensated (kWh)"
+                              }
+                            ]
+                          },
+                          "color": {
+                            "legend": {
+                              "position": "top"
+                            }
+                          },
+                          "label": {
+                            "show": true
+                          }
+                        },
+                        "queryName": "combo_primary_1"
+                      }
+                    ],
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  },
+                  "secondary": {
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "layers": [
+                      {
+                        "visual": "bar",
+                        "mark": {
+                          "colors": [
+                            "#0E0E76"
+                          ]
+                        },
+                        "encodings": {
+                          "value": {
+                            "fields": [
+                              {
+                                "fieldName": "measure(quarantine_measurements__consume_kwh_total)"
+                              }
+                            ]
+                          },
+                          "color": {
+                            "legend": {
+                              "position": "top"
+                            }
+                          },
+                          "label": {
+                            "show": true
+                          }
+                        },
+                        "queryName": "combo_secondary_1"
+                      }
+                    ],
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 10,
+            "width": 8,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "warning-customers-by-motive",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(quarantine_warning_customers__count)",
+                      "expression": "MEASURE(`quarantine_warning_customers`.`count`)"
+                    },
+                    {
+                      "name": "quarantine_warning_customers__motive",
+                      "expression": "`quarantine_warning_customers`.`motive`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Warning Customers by Motive",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "measure(quarantine_warning_customers__count)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Customers"
+                },
+                "color": {
+                  "fieldName": "quarantine_warning_customers__motive",
+                  "displayName": "Motive",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "segment_null",
+                        "color": "#00E0BF"
+                      }
+                    ]
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "warning-customers-by-segment",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "quarantine_warning_customers__segment",
+                      "expression": "`quarantine_warning_customers`.`segment`"
+                    },
+                    {
+                      "name": "measure(quarantine_warning_customers__count)",
+                      "expression": "MEASURE(`quarantine_warning_customers`.`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Warning Customers by Segment"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "quarantine_warning_customers__segment",
+                  "displayName": "Segment",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(quarantine_warning_customers__count)",
+                  "axis": {
+                    "hideGrid": true
+                  },
+                  "displayName": "Customers",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 15,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "warning-customers-table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "quarantine_warning_customers__customer_id",
+                      "expression": "`quarantine_warning_customers`.`customer_id`"
+                    },
+                    {
+                      "name": "quarantine_warning_customers__legal_name",
+                      "expression": "`quarantine_warning_customers`.`legal_name`"
+                    },
+                    {
+                      "name": "quarantine_warning_customers__segment",
+                      "expression": "`quarantine_warning_customers`.`segment`"
+                    },
+                    {
+                      "name": "quarantine_warning_customers__uf",
+                      "expression": "`quarantine_warning_customers`.`uf`"
+                    },
+                    {
+                      "name": "quarantine_warning_customers__motive",
+                      "expression": "`quarantine_warning_customers`.`motive`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Warning Customers"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "quarantine_warning_customers__customer_id",
+                    "headerAlignment": "left",
+                    "displayName": "Customer ID"
+                  },
+                  {
+                    "fieldName": "quarantine_warning_customers__legal_name",
+                    "headerAlignment": "left",
+                    "displayName": "Legal Name"
+                  },
+                  {
+                    "fieldName": "quarantine_warning_customers__segment",
+                    "headerAlignment": "left",
+                    "displayName": "Segment"
+                  },
+                  {
+                    "fieldName": "quarantine_warning_customers__uf",
+                    "headerAlignment": "left",
+                    "displayName": "UF"
+                  },
+                  {
+                    "fieldName": "quarantine_warning_customers__motive",
+                    "headerAlignment": "left",
+                    "displayName": "Motive"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 20,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
       "layoutVersion": "GRID_V1"
     }
   ],
